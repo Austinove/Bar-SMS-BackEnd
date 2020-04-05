@@ -9,7 +9,7 @@ app.use(cors());
 
 app.use(express.json());
 
-app.use("/api/user", require("./routes/auth/auth"));
+app.use("/api/auth", require("./routes/auth/auth"));
 app.use("/api/users", require("./routes/auth/users"));
 
 

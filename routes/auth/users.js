@@ -6,7 +6,7 @@ const jwt = require("jsonwebtoken");
 const User = require("../../models/User");
 
 //Register user
-router.post("/", (req, res) => {
+router.post("/register", (req, res) => {
   const { username, password } = req.body;
 
   //undefined validation
