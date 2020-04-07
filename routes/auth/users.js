@@ -6,12 +6,12 @@ const jwt = require("jsonwebtoken");
 const User = require("../../models/User");
 const auth = require("./middleware");
 
-//Register user
+//Register user route
 router.post("/register", (req, res) => {
-  const { username, password } = req.body;
+  const { username, role, password } = req.body;
 
   //undefined validation
-  if (!username || !password) {
+  if (!username ||!role || !password) {
     return res.status(400).json({ msg: "Please enter all fields" });
   }
 
@@ -22,6 +22,7 @@ router.post("/register", (req, res) => {
     }
     const newUser = new User({
       username,
+      role,
       password,
     });
 
@@ -47,6 +48,7 @@ router.post("/register", (req, res) => {
                 user: {
                   id: user._id,
                   username: user.username,
+                  role: user.role,
                 }
               });
             }
@@ -57,7 +59,8 @@ router.post("/register", (req, res) => {
   });
 });
 
-router.put("/password/:userId", auth, (req, res) => {
+// change password route
+router.put("/change/:userId", auth, (req, res) => {
   const { password } = req.body;
   const userId = req.params.userId;
   if (!password) {

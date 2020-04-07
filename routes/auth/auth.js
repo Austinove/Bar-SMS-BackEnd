@@ -38,17 +38,12 @@ router.post("/", (req, res) => {
             user: {
               id: user._id,
               username: user.username,
+              role: user.role,
             },
           });
         }
       );
     });
-  });
-});
-
-router.get("/", (req, res) => {
-  User.find().then((users) => {
-    res.json(users);
   });
 });
 
