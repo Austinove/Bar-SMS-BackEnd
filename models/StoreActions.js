@@ -1,18 +1,12 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
-//Create schema
-const ItemSchema = new Schema({
-    name: {
+const StoreActionSchema = new Schema({
+    item_id: {
         type: String,
-        required: true,
-        unique: true
-    },
-    price: {
-        type: Number,
         required: true
     },
-    manufacture: {
+    desc: {
         type: String,
         required: true
     },
@@ -20,11 +14,11 @@ const ItemSchema = new Schema({
         type: Number,
         required: true
     },
-    created: {
+    action_date: {
         type: Date,
         default: Date.now,
         required: true
     }
 });
 
-module.exports = Item = mongoose.model("Item", ItemSchema);
+module.exports = StoreAction = mongoose.model("StoreAction", StoreActionSchema);
