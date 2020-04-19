@@ -4,8 +4,8 @@
   "description": "Bar-SMS backend in node js",
   "main": "index.js",
   "scripts": {
-    "start" : "node index.js",
-    "server" : "nodemon index.js --ignore front-end",
+    "start": "node index.js",
+    "server": "nodemon index.js --ignore front-end",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Austin",
@@ -16,6 +16,7 @@
     "cors": "^2.8.5",
     "express": "^4.17.1",
     "jsonwebtoken": "^8.5.1",
+    "lodash": "^4.17.15",
     "mongoose": "^5.9.7",
     "nodemon": "^2.0.2"
   }

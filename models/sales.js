@@ -11,6 +11,10 @@ const SalesSchema = new Schema({
         type: Number,
         required: true
     },
+    amount: {
+        type: Number,
+        required: true
+    },
     made_date: {
         type: String,
         required: true
