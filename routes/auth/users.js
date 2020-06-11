@@ -7,11 +7,18 @@ const User = require("../../models/User");
 const auth = require("./middleware");
 
 //Register user route
-router.post("/register", (req, res) => {
-  const { username, role, password } = req.body;
+router.post("/register", auth, (req, res) => {
+  const {
+    username,
+    role,
+    password,
+    email,
+    residence,
+    phone
+  } = req.body;
 
   //undefined validation
-  if (!username ||!role || !password) {
+  if (!username || !role || !password || !email || !residence || !phone) {
     return res.status(400).json({ msg: "Please enter all fields" });
   }
 
@@ -24,6 +31,9 @@ router.post("/register", (req, res) => {
       username,
       role,
       password,
+      email,
+      residence,
+      phone
     });
 
     //create salt and hash
@@ -49,6 +59,9 @@ router.post("/register", (req, res) => {
                   id: user._id,
                   username: user.username,
                   role: user.role,
+                  phone: user.phone,
+                  residence: user.residence,
+                  email: user.email
                 }
               });
             }
@@ -61,7 +74,7 @@ router.post("/register", (req, res) => {
 
 // change password route
 router.put("/change/:userId", auth, (req, res) => {
-  const { password } = req.body;
+  const { password, oldPassword } = req.body;
   const userId = req.params.userId;
   if (!password) {
     return res.status(400).json({
@@ -76,32 +89,36 @@ router.put("/change/:userId", auth, (req, res) => {
       });
     }
 
+    bcrypt.compare(oldPassword, user.password).then((isMatch) => {
+      if (!isMatch) {
+        return res.status(500).json({ msg: "Wrong old password" });
+      } else {
+        bcrypt.genSalt(10, (err, salt) => {
+          bcrypt.hash(password, salt, (err, hash) => {
+            if (err) { throw err; }
+            var myquery = { _id: userId };
+            var newPassword = { $set: { password: hash } };
+            User.findByIdAndUpdate(myquery, newPassword, { new: true }, (err, user) => {
+              if (err) {
+                throw err
+              }
+              if (!user) {
+                res.send({ response: "user not found", message: false });
+              } else {
+                res.status(200).json({ response: "user password changed", message: true });
+              }
+            });
+          });
 
-    bcrypt.genSalt(10, (err, salt) => {
-      bcrypt.hash(password, salt, (err, hash) => {
-        if (err) { throw err; }
-        var errors = "";
-        var myquery = { _id: userId };
-        var newPassword = { $set: { password: hash } };
-        User.findByIdAndUpdate(myquery, newPassword, { new: true }, (err, user) => {
-          if (err) {
-            throw err
-          }
-          if (!user) {
-            res.send({ response: "user not found", message: false });
-          } else {
-            res.status(200).json({ response: "user password changed", message: true });
-          }
         });
-      });
-
+      }
     });
 
   });
 });
 
-router.get("/", (req, res) => {
-  User.find().then(users => {
+router.get("/", auth, (req, res) => {
+  User.find({}, { password: 0 }).then(users => {
     res.json(users)
   });
 });
