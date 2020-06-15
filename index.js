@@ -17,6 +17,7 @@ app.use("/api/counter", require("./routes/counter/index"));
 app.use("/api/counter/sales", require("./routes/counter/sales"));
 app.use("/api/lodge", require("./routes/lodge/index"));
 app.use("/api/lodge/sales", require("./routes/lodge/sales"));
+app.use("/api/expences", require("./routes/expences"));
 
 
 const port = process.env.PORT || 5000;
