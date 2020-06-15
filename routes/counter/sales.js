@@ -99,15 +99,12 @@ router.post("/make", auth, (req, res) => {
                 .then((Storeitem) => {
                   if (Storeitem.price) {
                     var amount = quantity * Storeitem.price;
-                    console.log(sale);
-
                     const newSale = new Sales({
                       item,
                       quantity,
                       amount,
                       made_date,
                     });
-
                     newSale
                       .save()
                       .then((sale) => {
