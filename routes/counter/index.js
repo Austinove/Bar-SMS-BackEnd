@@ -18,6 +18,7 @@ router.get("/", (req, res) => {
 
 router.post("/create", (req, res) => {
   const { item_id, quantity, role } = req.body;
+  console.log("item_id", item_id);
   if (role !== "admin") {
     return res.status(401).json({ msg: "authetication denied!" });
   }
@@ -73,14 +74,14 @@ router.post("/create", (req, res) => {
     if (result != null) {
       var counterQuantity = result.quantity + quantity;
       Counter.findOneAndUpdate(
-        item_id,
+        {item_id},
         { quantity: counterQuantity },
         { new: true },
-        (err, item) => {
+        (err, item_update) => {
           if (err) {
             throw err;
           }
-          res.status(200).send(item);
+          res.status(200).send(item_update);
         }
       );
     } else {
@@ -101,20 +102,21 @@ router.post("/create", (req, res) => {
   });
 });
 
-router.delete("/delete/:id", auth, (req, res) => {
+router.put("/remove/:id", auth, (req, res) => {
+  const { quantity } = req.body;
   Counter.findOne({ item_id: req.params.id }, (err, counter_item) => {
     if (err) {
       throw err;
     }
-    if (counter_item != null) {
-      Item.findById(req.params.id, (err, item) => {
+    if (counter_item != null && counter_item.quantity >= quantity) {
+      Item.findById({_id: req.params.id}, (err, item) => {
         if (err) {
           throw err;
         }
         if (item != null) {
-          var newQuantity = item.quantity + counter_item.quantity;
+          var newQuantity = item.quantity + quantity;
           Item.findByIdAndUpdate(
-            req.params.id,
+            { _id: req.params.id },
             { quantity: newQuantity },
             (err, result) => {
               if (err) {
@@ -130,7 +132,7 @@ router.delete("/delete/:id", auth, (req, res) => {
       const newAction = new StoreAction({
         item_id: req.params.id,
         desc: "Removed from Counter",
-        quantity: counter_item.quantity,
+        quantity: quantity,
       });
       newAction
         .save()
@@ -140,17 +142,23 @@ router.delete("/delete/:id", auth, (req, res) => {
         .catch((error) => {
           throw error;
         });
-    }
-  });
 
-  Counter.findByIdAndRemove(req.params.id, (err, result) => {
-    if (err) {
-      res.status(500).send(err);
+      const itemQuantity = counter_item.quantity - quantity;
+      Counter.findOneAndUpdate(
+        { item_id: req.params.id },
+        {quantity: itemQuantity},
+        (err, result) => {
+        if (err) {
+          res.status(500).send(err);
+        }
+        res.status(200).send({
+          msg: "Successfully removed"
+        });
+      });
+
+    }else{
+      res.status(500).send({ msg: "Counter has less quantity"});
     }
-    res.status(200).send({
-      msg: "Successfully removed",
-      id: result._id,
-    });
   });
 });
 

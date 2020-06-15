@@ -138,7 +138,8 @@ router.post("/make", auth, (req, res) => {
 
 // read by date
 router.post("/specific", auth, (req, res) => {
-  Sales.find(req.body)
+  const { made_date } = req.body;
+  Sales.find({ made_date })
     .then((items) => {
       return res.status(200).send(items);
     })
