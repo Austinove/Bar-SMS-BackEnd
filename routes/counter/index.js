@@ -18,11 +18,11 @@ router.get("/", (req, res) => {
 
 router.post("/create", (req, res) => {
   const { item_id, quantity, role } = req.body;
-  console.log("item_id", item_id);
+  // chek for admin user
   if (role !== "admin") {
     return res.status(401).json({ msg: "authetication denied!" });
   }
-
+// simple validation
   if (!item_id || !quantity) {
     res.status(400).json({
       msg: "All fields are required",
@@ -32,7 +32,7 @@ router.post("/create", (req, res) => {
     if (err) {
       throw err;
     }
-
+    // checking if item is in the store
     Item.findById(item_id, (err, item) => {
       if (err) {
         throw err;
@@ -56,7 +56,7 @@ router.post("/create", (req, res) => {
         res.status(404).send({ msg: "Items not found" });
       }
     });
-
+    // Saving action description to store
     const newAction = new StoreAction({
       item_id,
       desc: "Added to Counter",
@@ -70,7 +70,7 @@ router.post("/create", (req, res) => {
       .catch((error) => {
         throw error;
       });
-
+      // trying to add item quantity to the existing item
     if (result != null) {
       var counterQuantity = result.quantity + quantity;
       Counter.findOneAndUpdate(
@@ -85,6 +85,7 @@ router.post("/create", (req, res) => {
         }
       );
     } else {
+      // Adding new item to counter if it doesn't exist
       const newCounterItem = new Counter({
         item_id,
         quantity,
@@ -104,10 +105,18 @@ router.post("/create", (req, res) => {
 
 router.put("/remove/:id", auth, (req, res) => {
   const { quantity } = req.body;
+  // simple validation
+  if (!quantity) {
+    res.status(400).json({
+      msg: "Quantity of item to remove is required",
+    });
+  }
+  // finding the item in the counter
   Counter.findOne({ item_id: req.params.id }, (err, counter_item) => {
     if (err) {
       throw err;
     }
+    // Returning the item quantity to the store
     if (counter_item != null && counter_item.quantity >= quantity) {
       Item.findById({_id: req.params.id}, (err, item) => {
         if (err) {
@@ -128,7 +137,7 @@ router.put("/remove/:id", auth, (req, res) => {
           res.status(404).send({ msg: "Items not found" });
         }
       });
-
+      // Saving action description in the Store
       const newAction = new StoreAction({
         item_id: req.params.id,
         desc: "Removed from Counter",
@@ -142,7 +151,7 @@ router.put("/remove/:id", auth, (req, res) => {
         .catch((error) => {
           throw error;
         });
-
+        // Removing the quantity from counter
       const itemQuantity = counter_item.quantity - quantity;
       Counter.findOneAndUpdate(
         { item_id: req.params.id },
@@ -163,3 +172,14 @@ router.put("/remove/:id", auth, (req, res) => {
 });
 
 module.exports = router;
+
+// db.items.aggregate([
+//   {
+//     $lookup:{
+//       from:"counters",
+//       localField: "_id",
+//       foreignField: "item_id",
+//       as: "item_details"
+//     }
+//   }
+// ]);

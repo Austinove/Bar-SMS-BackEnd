@@ -8,7 +8,7 @@ const User = require("../../models/User");
 
 router.post("/", (req, res) => {
   const { username, password } = req.body;
-  //unidentified-validation
+  //undentified-validation
   if (!username || !password) {
     return res.status(500).json({ msg: "Please enter all fields" });
   }
