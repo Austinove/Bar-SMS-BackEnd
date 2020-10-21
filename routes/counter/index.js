@@ -171,15 +171,17 @@ router.put("/remove/:id", auth, (req, res) => {
   });
 });
 
-module.exports = router;
 
-// db.items.aggregate([
-//   {
-//     $lookup:{
-//       from:"counters",
-//       localField: "_id",
-//       foreignField: "item_id",
-//       as: "item_details"
-//     }
-//   }
-// ]);
+
+db.counters.aggregate([
+  {
+    $lookup:{
+      from:"items",
+      localField: "item_id",
+      foreignField: "_id",
+      as: "item_details"
+    }
+  }
+]);
+
+module.exports = router;

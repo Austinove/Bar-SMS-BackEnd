@@ -3,7 +3,7 @@ const Schema = mongoose.Schema;
 
 counterSchema = new Schema({
     item_id: {
-        type: String,
+        type: mongoose.Schema.ObjectId,
         unique: true,
         required: true
     },
